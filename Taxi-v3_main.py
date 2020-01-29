@@ -11,30 +11,34 @@ from deep_q_learning import DQN_Agent
 from brute_algorithm import brute_agent
 
 env = gym.make("Taxi-v3")
-env.reset()
 
-# q_agent = Agent_QL(env)
-# alpha = 0.1
-# gamma = 0.6
-# epsilon = 0.1
-# episodes = 10000
-# q_agent.train_agent(alpha, gamma, epsilon, episodes,'training_ql.npy')
-# q_agent.simulate('training_ql.npy')
+q_agent = Agent_QL(env)
+sim_episodes = 100
 
+q_agent.train_agent(alpha = 0.1, gamma = 0.6, epsilon = 0.1, episodes = 10000,filename='training_ql.npy')
+q_avg_timesteps, q_avg_penalties = q_agent.simulate('training_ql.npy', visualize = False, episodes=sim_episodes)
 
-# sarsa_agent = Agent_Sarsa(env)
-# alpha = 0.4
-# gamma = 0.999
-# epsilon = 0.9
-# episodes = 3000
-# max_steps = 2500
-# n_tests = 20
-# sarsa_agent.train_agent(alpha, gamma, epsilon, episodes, max_steps, n_tests,'training_sarsa.npy')
-# sarsa_agent.simulate()
+sarsa_agent = Agent_Sarsa(env)
+sarsa_agent.train_agent(alpha = 0.4, gamma = 0.999, epsilon = 0.9, episodes = 3000, max_steps = 2500, n_tests = 20,filename='training_sarsa.npy')
+s_avg_timesteps, s_avg_penalties = sarsa_agent.simulate(filename = 'training_sarsa.npy', visualize = False, episodes=sim_episodes)
 
 dqn_agent = DQN_Agent(env)
 dqn_agent.train_agent('dqn_weights.h5f')
-dqn_agent.simulate(episodes=50000)
+s_avg_timesteps,s_avg_reward = dqn_agent.simulate(episodes=sim_episodes, visualze = False)
+
+print(f"Results for {sim_episodes} episodes:")
+
+print("Q learning")
+print(f"Average timesteps per episode: {q_avg_timesteps}")
+print(f"Average reward per episode: {q_avg_penalties}")
+
+print("Sarsa learning")
+print(f"Average timesteps per episode: {s_avg_timesteps}")
+print(f"Average reward per episode: {s_avg_penalties}")
+
+print("DQN learning")
+print(f"Average timesteps per episode: {s_avg_timesteps}")
+print(f"Average reward per episode: {s_avg_reward}")
 
 
 # brute_agent = brute_agent(env)

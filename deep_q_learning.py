@@ -48,5 +48,7 @@ class DQN_Agent:
 		else:
 			self.dqn.load_weights(filename)
 
-	def simulate(self, episodes):
-		self.dqn.test(self.env, nb_episodes=episodes, visualize=False, nb_max_episode_steps=99)
+	def simulate(self, visualze, episodes):
+		visual = visualze
+		stats = self.dqn.test(self.env, nb_episodes=episodes, visualize=visual, nb_max_episode_steps=99)
+		return np.mean(stats.history['episode_reward']),np.mean(stats.history['nb_steps'])

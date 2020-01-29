@@ -123,11 +123,10 @@ class Agent_Sarsa:
             sleep(.5)
 
 
-    def simulate(self):
+    def simulate(self, filename, visualize, episodes):
         """Evaluate agent's performance after Q-learning"""
-        total_epochs, total_penalties = 0, 0
-        episodes = 1
-        Q = np.load('training_sarsa.npy')
+        total_epochs, total_penalties ,total_rewards = 0, 0, 0
+        Q = np.load(filename)
         frames = [] # for animation
 
         for _ in range(episodes):
@@ -139,6 +138,8 @@ class Agent_Sarsa:
             while not done:
                 action = np.argmax(Q[state])
                 state, reward, done, info = self.env.step(action)
+
+                total_rewards+=reward
 
                 if reward == -10:
                     penalties += 1
@@ -155,9 +156,13 @@ class Agent_Sarsa:
             total_penalties += penalties
             total_epochs += epochs
             
-        self.print_frames(frames)
-        print(f"Results after {episodes} episodes:")
-        print(f"Average timesteps per episode: {total_epochs / episodes}")
-        print(f"Average penalties per episode: {total_penalties / episodes}")
+        if visualize:  
+            self.print_frames(frames)
+        
+        avg_timesteps = total_epochs / episodes
+        avg_penalties = total_penalties / episodes
+        avg_rewards = total_rewards / episodes
+
+        return avg_timesteps, avg_rewards
 
 

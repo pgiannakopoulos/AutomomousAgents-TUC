@@ -69,10 +69,9 @@ class Agent_QL:
 
             print("Training finished.\n")
 
-    def simulate(self,filename):
+    def simulate(self,filename, visualize, episodes):
         """Evaluate agent's performance after Q-learning"""
-        total_epochs, total_penalties = 0, 0
-        episodes = 1
+        total_epochs, total_penalties ,total_rewards = 0, 0, 0
         q_table = np.load(filename)
         frames = [] # for animation
 
@@ -85,6 +84,8 @@ class Agent_QL:
             while not done:
                 action = np.argmax(q_table[state])
                 state, reward, done, info = self.env.step(action)
+
+                total_rewards+=reward
 
                 if reward == -10:
                     penalties += 1
@@ -100,10 +101,14 @@ class Agent_QL:
 
             total_penalties += penalties
             total_epochs += epochs
-            
-        self.print_frames(frames)
-        print(f"Results after {episodes} episodes:")
-        print(f"Average timesteps per episode: {total_epochs / episodes}")
-        print(f"Average penalties per episode: {total_penalties / episodes}")
+        
+        if visualize:  
+            self.print_frames(frames)
+        
+        avg_timesteps = total_epochs / episodes
+        avg_penalties = total_penalties / episodes
+        avg_rewards = total_rewards / episodes
+
+        return avg_timesteps, avg_rewards
 
 
