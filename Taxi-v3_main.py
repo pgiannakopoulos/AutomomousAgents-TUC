@@ -15,11 +15,11 @@ env = gym.make("Taxi-v3")
 q_agent = Agent_QL(env)
 sim_episodes = 100
 
-q_agent.train_agent(alpha = 0.1, gamma = 0.6, epsilon = 0.1, episodes = 10000,filename='training_ql.npy')
+q_agent.train_agent(alpha = 0.4, gamma = 0.95, epsilon = 0.9, episodes = 10000,filename='training_ql.npy')
 q_avg_timesteps, q_avg_penalties = q_agent.simulate('training_ql.npy', visualize = False, episodes=sim_episodes)
 
 sarsa_agent = Agent_Sarsa(env)
-sarsa_agent.train_agent(alpha = 0.4, gamma = 0.999, epsilon = 0.9, episodes = 3000, max_steps = 2500, n_tests = 20,filename='training_sarsa.npy')
+sarsa_agent.train_agent(alpha = 0.4, gamma = 0.999, epsilon = 0.9, episodes = 10000, max_steps = 2500, n_tests = 20,filename='training_sarsa.npy')
 s_avg_timesteps, s_avg_penalties = sarsa_agent.simulate(filename = 'training_sarsa.npy', visualize = False, episodes=sim_episodes)
 
 dqn_agent = DQN_Agent(env)
