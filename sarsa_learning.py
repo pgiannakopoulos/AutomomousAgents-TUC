@@ -20,20 +20,6 @@ class Agent_Sarsa:
     def __init__(self, env):
         self.env = env
 
-    def init_q(s, a, type="ones"):
-        """
-        @param s the number of states
-        @param a the number of actions
-        @param type random, ones or zeros for the initialization
-        """
-        if type == "ones":
-            return np.ones((s, a))
-        elif type == "random":
-            return np.random.random((s, a))
-        elif type == "zeros":
-            return np.zeros((s, a))
-
-
     def epsilon_greedy(Q, epsilon, n_actions, s, train=False):
         """
         @param Q Q values state x action -> value
@@ -47,70 +33,59 @@ class Agent_Sarsa:
             action = np.random.randint(0, n_actions)
         return action
 
-    def train_agent(self,alpha, gamma, epsilon, episodes, max_steps, n_tests, filename,render = False, test=False):
+    def train_agent(self, alpha, gamma, epsilon, episodes, max_steps, filename,render = False, test=False):
         """
         @param alpha learning rate
         @param gamma decay factor
         @param epsilon for exploration
         @param max_steps for max step in each episode
-        @param n_tests number of test episodes
         """
-        timestep_reward = []
-        if(not path.exists(filename)):
-            n_states, n_actions = self.env.observation_space.n, self.env.action_space.n
-            Q = self.init_q(n_states, n_actions, type="ones")
-            for episode in range(episodes):
-                print(f"Episode: {episode}")
-                total_reward = 0
-                s = self.env.reset()
-                a = epsilon_greedy(Q, epsilon, n_actions, s)
-                t = 0
-                done = False
-                while t < max_steps:
-                    if render:
-                        self.env.render()
-                    t += 1
-                    s_, reward, done, info = self.env.step(a)
-                    total_reward += reward
-                    a_ = epsilon_greedy(Q, epsilon, n_actions, s_)
-                    if done:
-                        Q[s, a] += alpha * ( reward  - Q[s, a] )
-                    else:
-                        Q[s, a] += alpha * ( reward + (gamma * Q[s_, a_] ) - Q[s, a] )
-                    s, a = s_, a_
-                    if done:
-                        if render:
-                            print(f"This episode took {t} timesteps and reward {total_reward}")
-                        timestep_reward.append(total_reward)
-                        break
-            if render:
-                print(f"Here are the Q values:\n{Q}\nTesting now:")
-            if test:
-                test_agent(Q, self.env, n_tests, n_actions)
 
-            np.save(filename, Q)
+        if(not path.exists(filename)):
+            # Initialize q table
+            n_actions = self.env.action_space.n
+            n_states = self.env.observation_space.n
+            q_table = np.zeros([n_states, n_actions])
+
+            for episode in range(episodes):
+                if episode % 100 == 0:
+                    print(f"Episode: {episode}")
+
+                state = self.env.reset()
+                done = False
+
+                # Explore or Exploit
+                if np.random.rand() < epsilon:
+                    action = np.argmax(q_table[state, :]) # Exploit learned values
+                else:
+                    action = np.random.randint(0, n_actions) # Explore action space
+                t = 0
+                while t < max_steps:
+
+                    state_, reward, done, info = self.env.step(action)
+
+                    if np.random.rand() < epsilon:
+                        action_ = np.argmax(q_table[state_, :]) # Exploit learned values
+                    else:
+                        action_ = np.random.randint(0, n_actions) # Explore action space
+                        
+                    # Update values
+                    old_value = q_table[state, action]       
+                    if done:
+                        new_value = old_value + alpha * (reward  - old_value)
+                        q_table[state, action] = new_value
+                        break
+                    else:
+                        new_value = old_value + alpha * (reward + (gamma * q_table[state_, action_] ) - old_value)
+                        q_table[state, action] = new_value
+                    state, action = state_, action_
+                    t += 1
+
+            # Save the values
+            np.save(filename, q_table)
 
             print("Training finished.\n")
-        return timestep_reward
 
-    def test_agent(Q, env, n_tests, n_actions, delay=0.1):
-        for test in range(n_tests):
-            print(f"Test #{test}")
-            s = env.reset()
-            done = False
-            epsilon = 0
-            total_reward = 0
-            while True:
-                time.sleep(delay)
-                env.render()
-                a = epsilon_greedy(Q, epsilon, n_actions, s, train=True)
-                print(f"Chose action {a} for state {s}")
-                s, reward, done, info = env.step(a)
-                total_reward += reward
-                if done:
-                    print(f"Episode reward: {total_reward}")
-                    time.sleep(1)
-                    break
 
     def print_frames(self, frames):
         for i, frame in enumerate(frames):
@@ -126,7 +101,7 @@ class Agent_Sarsa:
     def simulate(self, filename, visualize, episodes):
         """Evaluate agent's performance after Q-learning"""
         total_epochs, total_penalties ,total_rewards = 0, 0, 0
-        Q = np.load(filename)
+        q_table = np.load(filename)
         frames = [] # for animation
 
         for _ in range(episodes):
@@ -136,7 +111,7 @@ class Agent_Sarsa:
             done = False
             
             while not done:
-                action = np.argmax(Q[state])
+                action = np.argmax(q_table[state])
                 state, reward, done, info = self.env.step(action)
 
                 total_rewards+=reward

@@ -21,53 +21,51 @@ class Agent_QL:
             print(f"Reward: {frame['reward']}")
             sleep(.5)
 
-    def train_agent(self, alpha, gamma, epsilon, episodes, filename):
+    def train_agent(self, alpha, gamma, epsilon, episodes, max_steps, filename):
         """Training the agent"""
-        # state = env.encode(3, 1, 2, 0) # (taxi row, taxi column, passenger index, destination index)
-        # env.P[328] {action: [(probability, nextstate, reward, done)]}
-        action_man = {0 : "south", 1 : "north", 2 : "east", 3 : "west", 4 : "pickup", 5 : "dropoff"}
 
         if(not path.exists(filename)):
-
+            # Initialize q table
             q_table = np.zeros([self.env.observation_space.n, self.env.action_space.n])
 
-            # For plotting metrics
-            all_epochs = []
-            all_penalties = []
+            for episode in range(episodes):
+                if episode % 100 == 0:
+                    print(f"Episode: {episode}")
 
-            for i in range(1, episodes+1):
                 state = self.env.reset()
-
-                epochs, penalties, reward, = 0, 0, 0
                 done = False
                 
-                while not done:
-                    if random.uniform(0, 1) < epsilon:
-                        action = self.env.action_space.sample() # Explore action space
-                    else:
+                t = 0
+                while t < max_steps:
+
+                    # Explore or Exploit
+                    if np.random.rand() < epsilon:
                         action = np.argmax(q_table[state]) # Exploit learned values
+                    else:
+                        action = self.env.action_space.sample() # Explore action space
 
                     next_state, reward, done, info = self.env.step(action) 
                     
                     old_value = q_table[state, action]
                     next_max = np.max(q_table[next_state])
-                    
-                    new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-                    q_table[state, action] = new_value
 
-                    if reward == -10:
-                        penalties += 1
+                    # Update values
+                    if done:
+                        new_value = old_value + alpha * (reward - old_value)
+                        q_table[state, action] = new_value
+                        break
+                    else:
+                        new_value = old_value + alpha * (reward + (gamma * next_max) - old_value)
+                        q_table[state, action] = new_value
 
                     state = next_state
-                    epochs += 1
+                    t += 1
                     
-                if i % 100 == 0:
-                    clear_output(wait=True)
-                    print(f"Episode: {i}")
 
+            # Save the values
             np.save(filename, q_table)
 
-            print("Training finished.\n")
+            print("Training finished.\n") 
 
     def simulate(self,filename, visualize, episodes):
         """Evaluate agent's performance after Q-learning"""
