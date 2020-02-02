@@ -41,17 +41,17 @@ nb_actions = env.action_space.n
 
 # Next, we build a very simple model.
 model = Sequential()
-model.add(Embedding(500,10,input_length=1))
-model.add(Reshape((10,)))
-model.add(Dense(50, activation='relu'))
-model.add(Dense(50, activation='relu'))
+model.add(Dense(500,input_length=1,activation='relu'))
+# model.add(Reshape((10,)))
+# model.add(Dense(50, activation='relu'))
+# model.add(Dense(50, activation='relu'))
 model.add(Dense(50, activation='relu'))
 model.add(Dense(nb_actions, activation='linear'))
 print(model.summary())
 
 policy = EpsGreedyQPolicy()
 deep_sarsa = SARSAAgent(model=model, nb_actions=nb_actions, nb_steps_warmup=500, policy=policy)
-deep_sarsa.compile(Adam(lr=1e-3), metrics=['mae'])
+deep_sarsa.compile(loss='mse', optimizer=Adam(lr=1e-3), metrics=['mae'])
 
 if(not path.exists('dsarsa_{}_weights.h5f'.format(ENV_NAME))):
 	deep_sarsa.fit(env, nb_steps=230000, visualize=False, verbose=1)

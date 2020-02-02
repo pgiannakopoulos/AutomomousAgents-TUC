@@ -15,18 +15,23 @@ from os import path
 
 tf.compat.v1.disable_eager_execution()
 
-#  pip3 install tensorflow==2.0.0-beta
-
-import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+# import os
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+# os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 class DQN_Agent:
 	def __init__(self, env):
 		self.env = env
+
+		self.stats = dict()
+		self.stats['timesteps'] = list()
+		self.stats['reward'] = list()
+
 		np.random.seed(1)
 		self.nb_actions = env.action_space.n
 		self.nb_observations = env.observation_space.n
+
+		# Create the model
 		model = Sequential()
 		model.add(Embedding(self.nb_observations,10,input_length=1))
 		model.add(Reshape((10,)))
@@ -35,20 +40,33 @@ class DQN_Agent:
 		model.add(Dense(50, activation='relu'))
 		model.add(Dense(self.nb_actions, activation='linear'))
 		print(model.summary())
+
 		memory = SequentialMemory(limit=50000, window_length=1)
 		policy = EpsGreedyQPolicy()
 		self.dqn = DQNAgent(model=model, nb_actions=self.nb_actions, memory=memory, nb_steps_warmup=500,target_model_update=1e-2, policy=policy)
 		self.dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
-	def train_agent(self, filename):	
+	def train_agent(self, episodes, ep_step, filename):	
 		if(not path.exists(filename)):
-			self.dqn.fit(env, nb_steps=230000, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
-			# After training is done, we save the final weights.
+			for episode in range(ep_step,episodes+1, ep_step):
+				self.dqn.fit(self.env, nb_steps=episode, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
+				time, rew = self.simulate(visualze = False, episodes = 10)
+				self.stats['timesteps'].append(time)
+				self.stats['reward'].append(rew)
+
 			self.dqn.save_weights(filename, overwrite=True)
 		else:
 			self.dqn.load_weights(filename)
+		
 
 	def simulate(self, visualze, episodes):
 		visual = visualze
 		stats = self.dqn.test(self.env, nb_episodes=episodes, visualize=visual, nb_max_episode_steps=99)
-		return np.mean(stats.history['episode_reward']),np.mean(stats.history['nb_steps'])
+		return np.mean(stats.history['nb_steps']),np.mean(stats.history['episode_reward'])
+
+	def getStats(self):
+		return self.stats
+
+	def resetStats(self):
+		self.stats['timesteps'].clear()
+		self.stats['reward'].clear()

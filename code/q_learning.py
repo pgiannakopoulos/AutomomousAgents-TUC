@@ -11,6 +11,12 @@ class Agent_QL:
     def __init__(self, env):
         self.env = env
 
+        self.Q = None
+
+        self.stats = dict()
+        self.stats['timesteps'] = list()
+        self.stats['reward'] = list()
+
     def print_frames(self, frames):
         for i, frame in enumerate(frames):
             clear_output(wait=True)
@@ -21,7 +27,7 @@ class Agent_QL:
             print(f"Reward: {frame['reward']}")
             sleep(.5)
 
-    def train_agent(self, alpha, gamma, epsilon, episodes, max_steps, filename):
+    def train_agent(self, alpha, gamma, epsilon, episodes, ep_step, max_steps, filename):
         """Training the agent"""
 
         if(not path.exists(filename)):
@@ -59,7 +65,15 @@ class Agent_QL:
                         q_table[state, action] = new_value
 
                     state = next_state
+
                     t += 1
+
+                if (ep_step != -1) and (episode % ep_step == 0):
+                    self.Q = q_table
+                    time, rew = self.simulate(filename = None,visualize=False, episodes=10)
+                    self.stats['timesteps'].append(time)
+                    self.stats['reward'].append(reward)
+                    print("ep: {} -- saved: {}".format(ep_step,episode))
                     
 
             # Save the values
@@ -70,7 +84,11 @@ class Agent_QL:
     def simulate(self,filename, visualize, episodes):
         """Evaluate agent's performance after Q-learning"""
         total_epochs, total_penalties ,total_rewards = 0, 0, 0
-        q_table = np.load(filename)
+
+        if(filename != None):
+            q_table = np.load(filename)
+        else:
+            q_table = self.Q
         frames = [] # for animation
 
         for _ in range(episodes):
@@ -108,5 +126,12 @@ class Agent_QL:
         avg_rewards = total_rewards / episodes
 
         return avg_timesteps, avg_rewards
+
+    def getStats(self):
+        return self.stats
+
+    def resetStats(self):
+        self.stats['timesteps'].clear()
+        self.stats['reward'].clear()
 
 
