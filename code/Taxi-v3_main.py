@@ -22,7 +22,7 @@ class AgentAssessment:
         self.gamma = 0.95
         self.epsilon = 0.9
 
-        self.episodes = 1000
+        self.episodes = 10000
         self.ep_step= 100
         self.max_steps = 2500
 

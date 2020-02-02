@@ -78,9 +78,12 @@ class Agent_QL:
                     print("ep: {} -- saved: {}".format(ep_step,episode))
                  
                 # Decrease hyperparameters
-                alpha -= self.alpha_decay
-                gamma += self.gamma_decay
-                epsilon += self.epsilon_decay      
+                if alpha - self.alpha_decay > 0:
+                    alpha -= self.alpha_decay
+                if  gamma + self.gamma_decay < 1:
+                    gamma += self.gamma_decay
+                if epsilon + self.epsilon_decay < 1:
+                    epsilon += self.epsilon_decay      
             
             # Save the values
             np.save(filename, q_table)
