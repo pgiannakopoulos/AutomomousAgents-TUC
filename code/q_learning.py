@@ -6,12 +6,14 @@ from time import sleep
 import os.path
 from os import path
 
-
 class Agent_QL:
-    def __init__(self, env):
+    def __init__(self, env, alpha_decay = 0.0001, gamma_decay = 0.0001, epsilon_decay = 0.0001):
         self.env = env
 
         self.Q = None
+        self.alpha_decay = alpha_decay
+        self.gamma_decay = gamma_decay
+        self.epsilon_decay = epsilon_decay
 
         self.stats = dict()
         self.stats['timesteps'] = list()
@@ -74,8 +76,12 @@ class Agent_QL:
                     self.stats['timesteps'].append(time)
                     self.stats['reward'].append(reward)
                     print("ep: {} -- saved: {}".format(ep_step,episode))
-                    
-
+                 
+                # Decrease hyperparameters
+                alpha -= self.alpha_decay
+                gamma += self.gamma_decay
+                epsilon += self.epsilon_decay      
+            
             # Save the values
             np.save(filename, q_table)
 

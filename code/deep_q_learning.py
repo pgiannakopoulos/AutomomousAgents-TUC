@@ -12,6 +12,7 @@ from rl.memory import SequentialMemory
 import tensorflow as tf
 import os.path
 from os import path
+from time import sleep
 
 tf.compat.v1.disable_eager_execution()
 
@@ -50,7 +51,7 @@ class DQN_Agent:
 		if(not path.exists(filename)):
 			for episode in range(ep_step,episodes+1, ep_step):
 				self.dqn.fit(self.env, nb_steps=episode, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
-				time, rew = self.simulate(visualze = False, episodes = 10)
+				time, rew = self.simulate(visualize = False, episodes = 10)
 				self.stats['timesteps'].append(time)
 				self.stats['reward'].append(rew)
 
@@ -59,8 +60,8 @@ class DQN_Agent:
 			self.dqn.load_weights(filename)
 		
 
-	def simulate(self, visualze, episodes):
-		visual = visualze
+	def simulate(self, visualize, episodes):
+		visual = visualize
 		stats = self.dqn.test(self.env, nb_episodes=episodes, visualize=visual, nb_max_episode_steps=99)
 		return np.mean(stats.history['nb_steps']),np.mean(stats.history['episode_reward'])
 
