@@ -11,14 +11,13 @@ from os import path
 from q_learning import Agent_QL
 from sarsa_learning import Agent_Sarsa
 from deep_q_learning import DQN_Agent
-from deepsarsa import DSARSA_Agent
 from brute_algorithm import brute_agent
 
 class AgentAssessment:
     def __init__(self):
         # Set parameters
         self.env = gym.make("Taxi-v3")
-        self.episodes = 10000
+        self.episodes = 20000
         self.ep_step= 100
         self.max_steps = 2500
 
@@ -88,7 +87,7 @@ class AgentAssessment:
         plt.bar(y_pos, data, align='center', alpha=0.5)
         plt.xticks(y_pos, objects)
         plt.ylabel("{} Diagram".format(type))
-        plt.title("Average {} per episode".format(type))
+        plt.title("Average {}".format(type))
         plt.savefig("img/{}_bars.png".format(type))   # save the figure to file
         plt.close() 
         
@@ -102,7 +101,7 @@ class AgentAssessment:
                 print("*In order to continue in algorithms assessment delete or rename the files in training folder.*")
                 return
 
-            # Get the data for assessment
+            Get the data for assessment
             self.train_models()
             stats['q'] = self.q_agent.getStats()          #lists with data
             stats['sarsa'] = self.sarsa_agent.getStats()
@@ -112,14 +111,33 @@ class AgentAssessment:
             self.show_diagrams(ep,stats['q']['reward'],stats['sarsa']['reward'],stats['dqn']['reward'],1)
             self.show_diagrams(ep,stats['q']['timesteps'],stats['sarsa']['timesteps'],stats['dqn']['timesteps'],2)    
             
-            # Plot average data
-            data = [mean(stats['q']['reward']),mean(stats['sarsa']['reward']),mean(stats['dqn']['reward'])]
-            self.show_bars(data, 1)
+            # # Plot average data after training
+            q_time, q_rew = self.q_agent.simulate(filename='training/training_ql.npy', visualize = False, episodes=100)
+            sarsa_time, sarsa_rew = self.sarsa_agent.simulate(filename='training/training_sarsa.npy', visualize = False, episodes=100)
+            dqn_time, dqn_rew = self.dqn_agent.simulate(visualize=False, episodes=100)
 
-            data = [mean(stats['q']['timesteps']),mean(stats['sarsa']['timesteps']),mean(stats['dqn']['timesteps'])]
-            self.show_bars(data, 2)
+            data1 = [q_rew, sarsa_rew, dqn_rew]
+            self.show_bars(data1, 1)
+
+            data2 = [q_time, sarsa_time, dqn_time]
+            self.show_bars(data2, 2)
+
+            # data = [stats['q']['reward'][-1],stats['sarsa']['reward'][-1],stats['dqn']['reward'][-1]]
+            # self.show_bars(data, 1)
+
+            # data = [stats['q']['timesteps'][-1],stats['sarsa']['timesteps'][-1],stats['dqn']['timesteps'][-1]]
+            # self.show_bars(data, 2)
 
             print(f"Results for {self.episodes} episodes in folder img!")
+
+            Save the arrays to files for further analysis
+            np.save('plot_data/q_rewards.npy', stats['q']['reward'])
+            np.save('plot_data/q_timesteps.npy', stats['q']['timesteps'])
+            np.save('plot_data/q_rewards.npy', stats['sarsa']['reward'])
+            np.save('plot_data/q_timesteps.npy', stats['sarsa']['timesteps'])
+            np.save('plot_data/q_rewards.npy', stats['dqn']['reward'])
+            np.save('plot_data/q_timesteps.npy', stats['dqn']['timesteps'])
+            np.save('plot_data/episodes.npy', ep)
         else:
             print("*Plot images already exist in folder img*")
 
