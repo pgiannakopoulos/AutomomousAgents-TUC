@@ -16,28 +16,30 @@ from brute_algorithm import brute_agent
 
 class AgentAssessment:
     def __init__(self):
+        # Set parameters
         self.env = gym.make("Taxi-v3")
-
         self.episodes = 10000
         self.ep_step= 100
         self.max_steps = 2500
 
+        # Initialize the agents
         self.q_agent = Agent_QL(self.env)
         self.sarsa_agent = Agent_Sarsa(self.env)
         self.dqn_agent = DQN_Agent(self.env)
-        self.dsarsa_agent = DSARSA_Agent(self.env)
 
     def train_models(self):
         self.q_agent.train_agent(alpha = 0.75, gamma = 0.9, epsilon = 0.9, episodes = self.episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename='training/training_ql.npy')
         self.sarsa_agent.train_agent(alpha = 0.5, gamma = 0.975, epsilon = 0.9, episodes = self.episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename='training/training_sarsa.npy')
         self.dqn_agent.train_agent(episodes = self.episodes, ep_step=self.ep_step, filename = 'training/dqn_weights.h5f')
 
+    # Needed for show_diagramms function
     def make_patch_spines_invisible(self,ax):
         ax.set_frame_on(True)
         ax.patch.set_visible(False)
         for sp in ax.spines.values():
             sp.set_visible(False)
 
+    # Show plots with assessment results
     def show_diagrams(self, ep, data1, data2, data3, mode):
         if mode == 1:
             type = 'Reward'
@@ -100,8 +102,9 @@ class AgentAssessment:
                 print("*In order to continue in algorithms assessment delete or rename the files in training folder.*")
                 return
 
+            # Get the data for assessment
             self.train_models()
-            stats['q'] = self.q_agent.getStats()
+            stats['q'] = self.q_agent.getStats()          #lists with data
             stats['sarsa'] = self.sarsa_agent.getStats()
             stats['dqn'] = self.dqn_agent.getStats()
 
@@ -110,7 +113,6 @@ class AgentAssessment:
             self.show_diagrams(ep,stats['q']['timesteps'],stats['sarsa']['timesteps'],stats['dqn']['timesteps'],2)    
             
             # Plot average data
-
             data = [mean(stats['q']['reward']),mean(stats['sarsa']['reward']),mean(stats['dqn']['reward'])]
             self.show_bars(data, 1)
 
@@ -126,6 +128,7 @@ class AgentAssessment:
         print(f"Average timesteps per episode: {brute_avg_timesteps}")
         print(f"Average reward per episode: {brute_avg_reward}")
 
+    # Visualize the agent simulation
     def simulate_agent(self, type):
         if type == 1:
             self.q_agent.simulate(filename='training/training_ql.npy', visualize = True, episodes=1)
@@ -134,6 +137,7 @@ class AgentAssessment:
         elif type == 3:
             self.dqn_agent.simulate(visualize=True, episodes=1)
 
+    # Search for optimal hyperparameters
     def find_hyperparameters(self, algor):
         if (algor == 1):
             agent = self.q_agent
@@ -158,6 +162,8 @@ class AgentAssessment:
                     agent.train_agent(alpha = alpha, gamma = gamma, epsilon = epsilon, episodes = episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename="hyperparameters/"+name+'.npy')
                     timesteps, rewards = agent.simulate(filename="hyperparameters/"+name+'.npy', visualize = False, episodes=100)
                     ratio = rewards / timesteps
+
+                    #Check if a better combination has been found
                     if (ratio > best_value):
                         best_value = ratio
                         best_alpha = alpha
@@ -171,7 +177,7 @@ class AgentAssessment:
     def menu(self):
         print("Welcome to Taxi-v3 with Q, SARSA, DQN learning!")
         print("=====>  MENU  <=====")
-        print("--> 1: Traind & Assess the algorithms.")
+        print("--> 1: Train & Assess the algorithms.")
         print("--> 2: Simulate.")
         print("--> 3: Find the optimal hyperparameters.")
         print("--> To exit press any number.")

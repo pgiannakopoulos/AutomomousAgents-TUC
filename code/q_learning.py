@@ -29,8 +29,8 @@ class Agent_QL:
             print(f"Reward: {frame['reward']}")
             sleep(.5)
 
+    # Train the agent
     def train_agent(self, alpha, gamma, epsilon, episodes, ep_step, max_steps, filename):
-        """Training the agent"""
 
         if(not path.exists(filename)):
             # Initialize q table
@@ -89,8 +89,8 @@ class Agent_QL:
 
             print("Training finished.\n") 
 
+    # Evaluate the agent       
     def simulate(self,filename, visualize, episodes):
-        """Evaluate agent's performance after Q-learning"""
         total_epochs, total_penalties ,total_rewards = 0, 0, 0
 
         if(filename != None):

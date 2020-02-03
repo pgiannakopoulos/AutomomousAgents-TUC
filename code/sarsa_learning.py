@@ -6,17 +6,7 @@ from time import sleep
 import os.path
 from os import path
 
-"""
-SARSA on policy learning python implementation.
-This is a python implementation of the SARSA algorithm in the Sutton and Barto's book on
-RL. It's called SARSA because - (state, action, reward, state, action). The only difference
-between SARSA and Qlearning is that SARSA takes the next action based on the current policy
-while qlearning takes the action with maximum utility of next state.
-Using the simplest gym self.environment for brevity: https://gym.openai.com/self.envs/FrozenLake-v0/
-"""
-
 class Agent_Sarsa:
-    """docstring for ClassName"""
     def __init__(self, env, alpha_decay = 0.0001, gamma_decay = 0.0001, epsilon_decay = 0.0001):
         self.env = env
 
@@ -29,27 +19,7 @@ class Agent_Sarsa:
         self.stats['timesteps'] = list()
         self.stats['reward'] = list()
 
-    def epsilon_greedy(Q, epsilon, n_actions, s, train=False):
-        """
-        @param Q Q values state x action -> value
-        @param epsilon for exploration
-        @param s number of states
-        @param train if true then no random actions selected
-        """
-        if train or np.random.rand() < epsilon:
-            action = np.argmax(Q[s, :])
-        else:
-            action = np.random.randint(0, n_actions)
-        return action
-
     def train_agent(self, alpha, gamma, epsilon, episodes, ep_step, max_steps, filename,render = False, test=False):
-        """
-        @param alpha learning rate
-        @param gamma decay factor
-        @param epsilon for exploration
-        @param max_steps for max step in each episode
-        """
-
         if(not path.exists(filename)):
             # Initialize q table
             n_actions = self.env.action_space.n
@@ -120,9 +90,8 @@ class Agent_Sarsa:
             print(f"Reward: {frame['reward']}")
             sleep(.5)
 
-
+    # Evaluate the agent
     def simulate(self, filename, visualize, episodes):
-        """Evaluate agent's performance after Q-learning"""
         total_epochs, total_penalties ,total_rewards = 0, 0, 0
 
         if(filename != None):

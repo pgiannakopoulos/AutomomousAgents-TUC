@@ -47,6 +47,7 @@ class DQN_Agent:
 		self.dqn = DQNAgent(model=model, nb_actions=self.nb_actions, memory=memory, nb_steps_warmup=500,target_model_update=1e-2, policy=policy)
 		self.dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
+	# Train the agent
 	def train_agent(self, episodes, ep_step, filename):	
 		if(not path.exists(filename)):
 			for episode in range(ep_step,episodes+1, ep_step):
@@ -59,7 +60,7 @@ class DQN_Agent:
 		else:
 			self.dqn.load_weights(filename)
 		
-
+	# Evaluate the agent
 	def simulate(self, visualize, episodes):
 		visual = visualize
 		stats = self.dqn.test(self.env, nb_episodes=episodes, visualize=visual, nb_max_episode_steps=99)
