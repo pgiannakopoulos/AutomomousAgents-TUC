@@ -18,10 +18,6 @@ class AgentAssessment:
     def __init__(self):
         self.env = gym.make("Taxi-v3")
 
-        self.alpha = 0.1
-        self.gamma = 0.95
-        self.epsilon = 0.9
-
         self.episodes = 10000
         self.ep_step= 100
         self.max_steps = 2500
@@ -32,8 +28,8 @@ class AgentAssessment:
         self.dsarsa_agent = DSARSA_Agent(self.env)
 
     def train_models(self):
-        self.q_agent.train_agent(alpha = self.alpha, gamma = self.gamma, epsilon = self.epsilon, episodes = self.episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename='training/training_ql.npy')
-        self.sarsa_agent.train_agent(alpha = self.alpha, gamma = self.gamma, epsilon = self.epsilon, episodes = self.episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename='training/training_sarsa.npy')
+        self.q_agent.train_agent(alpha = 0.75, gamma = 0.9, epsilon = 0.9, episodes = self.episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename='training/training_ql.npy')
+        self.sarsa_agent.train_agent(alpha = 0.5, gamma = 0.975, epsilon = 0.9, episodes = self.episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename='training/training_sarsa.npy')
         self.dqn_agent.train_agent(episodes = self.episodes, ep_step=self.ep_step, filename = 'training/dqn_weights.h5f')
 
     def make_patch_spines_invisible(self,ax):
@@ -137,8 +133,88 @@ class AgentAssessment:
             self.sarsa_agent.simulate(filename='training/training_sarsa.npy', visualize = True, episodes=1)
         elif type == 3:
             self.dqn_agent.simulate(visualize=True, episodes=1)
-            
-        
+
+    def find_hyperparameters(self, algor):
+        if (algor == 1):
+            agent = self.q_agent
+            name = "q_learning"
+        else:
+            agent = self.sarsa_agent
+            name = "sarsa_learning"
+
+        alpha_table = np.linspace(start = .5, stop = 1, num = 5)
+        gamma_table = np.linspace(start = .9, stop = 1, num = 5)
+        epsilon_table = np.linspace(start = .4, stop = .9, num = 5)
+        episodes = 1000
+
+        best_value = float("-inf")
+        best_alpha = 0
+        best_gamma = 0
+        best_epsilon = 0
+
+        for alpha in alpha_table:
+            for gamma in gamma_table:
+                for epsilon in epsilon_table:
+                    agent.train_agent(alpha = alpha, gamma = gamma, epsilon = epsilon, episodes = episodes, ep_step=self.ep_step, max_steps = self.max_steps, filename="hyperparameters/"+name+'.npy')
+                    timesteps, rewards = agent.simulate(filename="hyperparameters/"+name+'.npy', visualize = False, episodes=100)
+                    ratio = rewards / timesteps
+                    if (ratio > best_value):
+                        best_value = ratio
+                        best_alpha = alpha
+                        best_gamma = gamma
+                        best_epsilon = epsilon
+                    os.remove("hyperparameters/"+name+'.npy')
+                    print("alpha:{} , gamma:{}, epsilon:{} -- ratio:{}".format(alpha, gamma, epsilon, ratio))
+        print("{} ==> alpha:{} , gamma:{}, epsilon:{} with ratio:{}".format(name,best_alpha, best_gamma, best_epsilon, best_value))
+        return best_alpha, best_gamma, best_epsilon
+
+    def menu(self):
+        print("Welcome to Taxi-v3 with Q, SARSA, DQN learning!")
+        print("=====>  MENU  <=====")
+        print("--> 1: Traind & Assess the algorithms.")
+        print("--> 2: Simulate.")
+        print("--> 3: Find the optimal hyperparameters.")
+        print("--> To exit press any number.")
+        print("*1 & 3 will take some time.*")
+        print("Choose one option by typing the corresponding number.")
+        try:
+            option=int(input('Input: '))
+            if option == 1:
+                self.assess_models()
+            elif option == 2:
+                print('Type 1 for Q, 2 for SARSA, 3 for DQN:')
+                try:
+                    option=int(input('Input: '))
+                    if option > 3 and option < 0:
+                        print("Invalid option!")
+                        return
+                    self.simulate_agent(option)
+                except ValueError:
+                    print("Not a number")
+                    return
+            elif option == 3:
+                print('Type 1 for Q, 2 for SARSA:')
+                try:
+                    option=int(input('Input: '))
+                    if option > 2 and option < 0:
+                        print("Invalid option!")
+                        return
+                    self.find_hyperparameters(option)
+                except ValueError:
+                    print("Not a number")
+                    return
+            else:
+                print("Bye!")
+        except ValueError:
+            print("Not a number")
+
 agent = AgentAssessment()
-agent.assess_models()
+agent.menu()
+# agent.assess_models()
 # agent.simulate_agent(3)
+
+#q_learning ==> alpha:0.75 , gamma:0.9, epsilon:0.9 with ratio:0.6881028938906754
+# agent.find_hyperparameters(1)
+
+#sarsa_learning ==> alpha:0.5 , gamma:0.975, epsilon:0.9 with ratio:0.2330960854092527
+# agent.find_hyperparameters(2)

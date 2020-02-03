@@ -75,7 +75,6 @@ class Agent_QL:
                     time, rew = self.simulate(filename = None,visualize=False, episodes=10)
                     self.stats['timesteps'].append(time)
                     self.stats['reward'].append(reward)
-                    print("ep: {} -- saved: {}".format(ep_step,episode))
                  
                 # Decrease hyperparameters
                 if alpha - self.alpha_decay > 0:
