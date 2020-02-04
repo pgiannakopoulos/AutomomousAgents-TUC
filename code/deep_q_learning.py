@@ -14,7 +14,7 @@ import os.path
 from os import path
 from time import sleep
 
-tf.compat.v1.disable_eager_execution()
+# tf.compat.v1.disable_eager_execution()
 
 # import os
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
@@ -76,3 +76,6 @@ class DQN_Agent:
 	def resetStats(self):
 		self.stats['timesteps'].clear()
 		self.stats['reward'].clear()
+
+	def loadWeights(self, filename):
+		self.dqn.load_weights(filename)

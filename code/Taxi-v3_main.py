@@ -153,6 +153,7 @@ class AgentAssessment:
         elif type == 2:
             self.sarsa_agent.simulate(filename='training/training_sarsa.npy', visualize = True, episodes=1)
         elif type == 3:
+            self.dqn_agent.loadWeights(filename = 'training/dqn_weights.h5f')
             self.dqn_agent.simulate(visualize=True, episodes=1)
 
     # Search for optimal hyperparameters
