@@ -18,7 +18,7 @@ class AgentAssessment:
         # Set parameters
         self.env = gym.make("Taxi-v3")
         self.episodes = 20000
-        self.ep_step= 100
+        self.ep_step=  100
         self.max_steps = 2500
 
         # Initialize the agents
@@ -101,7 +101,7 @@ class AgentAssessment:
                 print("*In order to continue in algorithms assessment delete or rename the files in training folder.*")
                 return
 
-            Get the data for assessment
+            # Get the data for assessment
             self.train_models()
             stats['q'] = self.q_agent.getStats()          #lists with data
             stats['sarsa'] = self.sarsa_agent.getStats()
@@ -111,7 +111,7 @@ class AgentAssessment:
             self.show_diagrams(ep,stats['q']['reward'],stats['sarsa']['reward'],stats['dqn']['reward'],1)
             self.show_diagrams(ep,stats['q']['timesteps'],stats['sarsa']['timesteps'],stats['dqn']['timesteps'],2)    
             
-            # # Plot average data after training
+            # Plot average data after training
             q_time, q_rew = self.q_agent.simulate(filename='training/training_ql.npy', visualize = False, episodes=100)
             sarsa_time, sarsa_rew = self.sarsa_agent.simulate(filename='training/training_sarsa.npy', visualize = False, episodes=100)
             dqn_time, dqn_rew = self.dqn_agent.simulate(visualize=False, episodes=100)
@@ -130,7 +130,7 @@ class AgentAssessment:
 
             print(f"Results for {self.episodes} episodes in folder img!")
 
-            Save the arrays to files for further analysis
+            # Save the arrays to files for further analysis
             np.save('plot_data/q_rewards.npy', stats['q']['reward'])
             np.save('plot_data/q_timesteps.npy', stats['q']['timesteps'])
             np.save('plot_data/q_rewards.npy', stats['sarsa']['reward'])
