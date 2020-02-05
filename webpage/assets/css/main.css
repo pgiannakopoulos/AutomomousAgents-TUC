@@ -135,7 +135,7 @@ header.special {
   text-align: center;
   margin-bottom: 4rem; }
   header.special p {
-    max-width: 75%;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto; }
 
@@ -1981,7 +1981,7 @@ ul.icons {
     text-decoration: none; }
     #banner a:hover {
       color: #ffffff; }
-  #banner video {
+  #banner img {
     -moz-transform: translateX(50%) translateY(50%);
     -webkit-transform: translateX(50%) translateY(50%);
     -ms-transform: translateX(50%) translateY(50%);
@@ -2014,7 +2014,7 @@ ul.icons {
     width: 100%;
     z-index: 1; }
   #banner:after {
-    background: linear-gradient(135deg, #ce1b28 0%, #111111 74%);
+    /*background: linear-gradient(135deg, #ce1b28 0%, #111111 74%);*/
     content: ' ';
     display: block;
     height: 100%;
@@ -2065,7 +2065,7 @@ ul.icons {
   background-color: #ce1b28;
   color: rgba(255, 255, 255, 0.75);
   background-attachment: fixed;
-  background-image: linear-gradient(rgba(206, 27, 40, 0.25), rgba(206, 27, 40, 0.25)), url(../../images/cta01.jpg);
+  background-image: linear-gradient(rgba(206, 27, 40, 0.25), rgba(206, 27, 40, 0.25)), url(../../images/22589.jpg);
   background-position: bottom;
   background-repeat: no-repeat;
   background-size: cover;
@@ -2825,3 +2825,32 @@ body.is-menu-visible #menu {
   transform: translateX(0);
   box-shadow: 0 0 1.5rem 0 rgba(0, 0, 0, 0.2);
   visibility: visible; }
+
+/* Create two equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 50%;
+  padding: 10px;
+}
+
+.column img {
+  margin-top: 12px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.leftbox { 
+  float:left;  
+  width:25%;
+  height: 100%;
+} 
+.rightbox{ 
+  float:right;  
+  width:75%; 
+  height: 100%;
+} 
