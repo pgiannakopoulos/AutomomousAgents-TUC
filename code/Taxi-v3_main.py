@@ -114,7 +114,7 @@ class AgentAssessment:
             # Plot average data after training
             q_time, q_rew = self.q_agent.simulate(filename='training/training_ql.npy', visualize = False, episodes=100)
             sarsa_time, sarsa_rew = self.sarsa_agent.simulate(filename='training/training_sarsa.npy', visualize = False, episodes=100)
-            dqn_time, dqn_rew = self.dqn_agent.simulate(visualize=False, episodes=100)
+            dqn_time, dqn_rew = self.dqn_agent.simulate(filename = 'training/dqn_weights.h5f', visualize=False, episodes=100)
 
             data1 = [q_rew, sarsa_rew, dqn_rew]
             self.show_bars(data1, 1)
@@ -153,8 +153,7 @@ class AgentAssessment:
         elif type == 2:
             self.sarsa_agent.simulate(filename='training/training_sarsa.npy', visualize = True, episodes=1)
         elif type == 3:
-            self.dqn_agent.loadWeights(filename = 'training/dqn_weights.h5f')
-            self.dqn_agent.simulate(visualize=True, episodes=1)
+            self.dqn_agent.simulate(filename = 'training/dqn_weights.h5f', visualize=True, episodes=1)
 
     # Search for optimal hyperparameters
     def find_hyperparameters(self, algor):

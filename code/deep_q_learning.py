@@ -50,11 +50,14 @@ class DQN_Agent:
 	# Train the agent
 	def train_agent(self, episodes, ep_step, filename):	
 		if(not path.exists(filename)):
-			for episode in range(ep_step,episodes+1, ep_step):
-				data = self.dqn.fit(self.env, nb_steps=episode, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
-				time, rew = self.simulate(visualize = False, episodes = 10)
-				self.stats['timesteps'].append(time)
-				self.stats['reward'].append(rew)
+			if ep_step == -1:
+				self.dqn.fit(self.env, nb_steps=episodes, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
+			else:
+				for episode in range(ep_step,episodes+1, ep_step):
+					data = self.dqn.fit(self.env, nb_steps=episode, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
+					time, rew = self.simulate(visualize = False, episodes = 10)
+					self.stats['timesteps'].append(time)
+					self.stats['reward'].append(rew)
 
 				# data = self.dqn.fit(self.env, nb_steps=episode, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
 				# self.stats['timesteps'].append(np.mean(data.history['nb_steps']))
@@ -65,7 +68,11 @@ class DQN_Agent:
 			self.dqn.load_weights(filename)
 		
 	# Evaluate the agent
-	def simulate(self, visualize, episodes):
+	def simulate(self, filename, visualize, episodes):
+		if(not path.exists(filename)):
+			train_agent(episodes = 2000, ep_step=-1, filename=filename)
+		else:
+		 	self.dqn.load_weights(filename) 
 		visual = visualize
 		data = self.dqn.test(self.env, nb_episodes=episodes, visualize=visual, nb_max_episode_steps=99)
 		return np.mean(data.history['nb_steps']),np.mean(data.history['episode_reward'])
