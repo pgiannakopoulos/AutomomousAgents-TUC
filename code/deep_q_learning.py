@@ -14,7 +14,7 @@ import os.path
 from os import path
 from time import sleep
 
-# tf.compat.v1.disable_eager_execution()
+tf.compat.v1.disable_eager_execution()
 
 # import os
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
@@ -58,11 +58,6 @@ class DQN_Agent:
 					time, rew = self.simulate(visualize = False, episodes = 10)
 					self.stats['timesteps'].append(time)
 					self.stats['reward'].append(rew)
-
-				# data = self.dqn.fit(self.env, nb_steps=episode, visualize=False, verbose=1, nb_max_episode_steps=99, log_interval=2000)
-				# self.stats['timesteps'].append(np.mean(data.history['nb_steps']))
-				# self.stats['reward'].append(np.mean(data.history['episode_reward']))
-
 			self.dqn.save_weights(filename, overwrite=True)
 		else:
 			self.dqn.load_weights(filename)

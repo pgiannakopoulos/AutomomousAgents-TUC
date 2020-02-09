@@ -122,21 +122,15 @@ class AgentAssessment:
             data2 = [q_time, sarsa_time, dqn_time]
             self.show_bars(data2, 2)
 
-            # data = [stats['q']['reward'][-1],stats['sarsa']['reward'][-1],stats['dqn']['reward'][-1]]
-            # self.show_bars(data, 1)
-
-            # data = [stats['q']['timesteps'][-1],stats['sarsa']['timesteps'][-1],stats['dqn']['timesteps'][-1]]
-            # self.show_bars(data, 2)
-
             print(f"Results for {self.episodes} episodes in folder img!")
 
             # Save the arrays to files for further analysis
             np.save('plot_data/q_rewards.npy', stats['q']['reward'])
             np.save('plot_data/q_timesteps.npy', stats['q']['timesteps'])
-            np.save('plot_data/q_rewards.npy', stats['sarsa']['reward'])
-            np.save('plot_data/q_timesteps.npy', stats['sarsa']['timesteps'])
-            np.save('plot_data/q_rewards.npy', stats['dqn']['reward'])
-            np.save('plot_data/q_timesteps.npy', stats['dqn']['timesteps'])
+            np.save('plot_data/sarsa_rewards.npy', stats['sarsa']['reward'])
+            np.save('plot_data/sarsa_timesteps.npy', stats['sarsa']['timesteps'])
+            np.save('plot_data/dqn_rewards.npy', stats['dqn']['reward'])
+            np.save('plot_data/dqn_timesteps.npy', stats['dqn']['timesteps'])
             np.save('plot_data/episodes.npy', ep)
         else:
             print("*Plot images already exist in folder img*")
@@ -234,11 +228,3 @@ class AgentAssessment:
 
 agent = AgentAssessment()
 agent.menu()
-# agent.assess_models()
-# agent.simulate_agent(3)
-
-#q_learning ==> alpha:0.75 , gamma:0.9, epsilon:0.9 with ratio:0.6881028938906754
-# agent.find_hyperparameters(1)
-
-#sarsa_learning ==> alpha:0.5 , gamma:0.975, epsilon:0.9 with ratio:0.2330960854092527
-# agent.find_hyperparameters(2)
