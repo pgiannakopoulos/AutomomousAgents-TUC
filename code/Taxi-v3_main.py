@@ -136,7 +136,7 @@ class AgentAssessment:
             print("*Plot images already exist in folder img*")
 
         print("NO learning")
-        brute_avg_timesteps, brute_avg_reward = brute_agent(self.env, self.episodes)
+        brute_avg_timesteps, brute_avg_reward = brute_agent(self.env, 100)
         print(f"Average timesteps per episode: {brute_avg_timesteps}")
         print(f"Average reward per episode: {brute_avg_reward}")
 

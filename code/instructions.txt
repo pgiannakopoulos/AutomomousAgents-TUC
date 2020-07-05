@@ -1,0 +1,13 @@
+Start the application by typing: "python3 Taxi-v3_main.py"
+
+==> Do not delete any folder even if it empty. Some folder are for temp files.
+
+
+Required Packages:
+1. numpy
+2. matplotlib
+3. gym
+4. keras-rl
+5. keras
+6. Tensorflow
+7. IPython
